@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio 53 — Генератор Stories v2.0 Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1312;
+      --panel: #181f1d;
+      --accent: #d8b47e;
+      --text: #f4f1ea;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      padding: 24px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .controls {
+      background: var(--panel);
+      padding: 24px;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 460px;
+      border: 1px solid rgba(216, 180, 126, 0.22);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .controls h2 {
+      font-size: 19px;
+      margin-bottom: 16px;
+      color: var(--accent);
+      letter-spacing: 0.3px;
+    }
+    .field { margin-bottom: 13px; }
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #a9b5b1;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .field select, .field input[type="text"], .field textarea, .field input[type="file"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1px solid #2e3a36;
+      background: #0f1413;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .field textarea { resize: vertical; min-height: 62px; }
+    .sliders-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      background: rgba(0,0,0,0.25);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(216, 180, 126, 0.12);
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #c8d2ce;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .checkbox-row input { accent-color: var(--accent); width: 16px; height: 16px; }
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #e5c592, #b98b4a);
+      color: #101514;
+      font-weight: 800;
+      font-size: 15px;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      margin-top: 6px;
+      box-shadow: 0 8px 20px rgba(216, 180, 126, 0.25);
+      transition: transform 0.1s, filter 0.15s;
+    }
+    .btn:hover { filter: brightness(1.06); }
+    .btn:active { transform: scale(0.98); }
+    .preview-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: sticky;
+      top: 20px;
+    }
+    canvas {
+      width: 378px;
+      height: 672px;
+      border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.75);
+      border: 1px solid rgba(216, 180, 126, 0.3);
+      background: #101615;
+    }
+    .hint {
+      font-size: 12px;
+      color: #889490;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <h2>✨ Studio 53 • Конструктор Сторис v2.0 Pro</h2>
+
+    <div class="field">
+      <label>Композиция макета:</label>
+      <select id="layoutSelect">
+        <option value="editorial">Журнальный (Четкое фото сверху + Карточка снизу)</option>
+        <option value="centered">Классический (Полноэкранный с крупным центром)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Выберите праздник Беларуси:</label>
+      <select id="presetSelect">
+        <option value="trainer">30 октября — День тренера (выложить сегодня)</option>
+        <option value="mechanic">30 октября — День инженера-механика</option>
+        <option value="manager">1 ноября — День менеджера (выложить 31 окт)</option>
+        <option value="aviation">1 ноября — День гражданской авиации РБ</option>
+        <option value="pm">5 ноября — День проектного менеджера (IT)</option>
+        <option value="men">7 ноября — Всемирный день мужчин</option>
+        <option value="accountant">10 ноября — День бухгалтера</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Загрузить фоновую картинку (AI или фото студии):</label>
+      <input type="file" id="bgUpload" accept="image/*">
+    </div>
+
+    <div class="sliders-grid">
+      <div class="field" style="margin:0;">
+        <label><span>Яркость фото</span><span id="brightVal">85%</span></label>
+        <input type="range" id="photoBrightness" min="25" max="100" value="85">
+      </div>
+      <div class="field" style="margin:0;">
+        <label><span>Затемнение под текстом</span><span id="scrimVal">82%</span></label>
+        <input type="range" id="scrimOpacity" min="40" max="98" value="82">
+      </div>
+      <div class="field" style="margin:0;">
+        <label><span>Масштаб фото</span><span id="zoomVal">100%</span></label>
+        <input type="range" id="photoZoom" min="100" max="160" value="100">
+      </div>
+      <div class="field" style="margin:0;">
+        <label><span>Сдвиг фото по верт.</span><span id="offsetYVal">0</span></label>
+        <input type="range" id="photoOffsetY" min="-350" max="350" value="0">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Плашка даты:</label>
+      <input type="text" id="dateBadge" value="ЗАВТРА • 30 ОКТЯБРЯ">
+    </div>
+
+    <div class="field">
+      <label>Главный заголовок:</label>
+      <input type="text" id="titleInput" value="С наступающим Днём тренера!">
+    </div>
+
+    <div class="field">
+      <label>Поздравление (под заголовком):</label>
+      <textarea id="subtitleInput">Они следят за нашей техникой, считают подходы и делают нас сильнее. Но даже самым крепким спинам нужна перезагрузка.</textarea>
+    </div>
+
+    <div class="field">
+      <label>Текст внутри карточки сертификата:</label>
+      <textarea id="offerInput">Знаете классного тренера или сами живёте спортом? Подарите 60 минут глубокого восстановления в нашем уютном оазисе.</textarea>
+    </div>
+
+    <div class="field">
+      <label>Текст на золотой кнопке:</label>
+      <input type="text" id="priceInput" value="Любой массаж 60 мин — 90 BYN">
+    </div>
+
+    <div class="field">
+      <label>Подпись внизу карточки:</label>
+      <input type="text" id="deliveryInput" value="⚡ Электронный за 2 мин в Telegram или бумажный в конверте">
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="showStickerGuide" checked>
+      Показывать плашку-ориентир для стикера ссылки внизу
+    </label>
+
+    <button class="btn" id="downloadBtn">⬇ Скачать Story 1080×1920 в максимальном качестве</button>
+  </div>
+
+  <div class="preview-wrap">
+    <canvas id="storyCanvas" width="1080" height="1920"></canvas>
+    <div class="hint">Оригинальное разрешение скачивания: 1080×1920 px (9:16 HD)</div>
+  </div>
+
+<script>
+  const presets = {
+    trainer: {
+      date: "ЗАВТРА • 30 ОКТЯБРЯ",
+      title: "С наступающим Днём тренера!",
+      subtitle: "Они следят за нашей техникой, считают подходы и делают нас сильнее. Но даже самым крепким спинам нужна перезагрузка.",
+      offer: "Знаете классного тренера или сами живёте спортом? Подарите 60 минут глубокого восстановления в нашем уютном оазисе."
+    },
+    mechanic: {
+      date: "ЗАВТРА • 30 ОКТЯБРЯ",
+      title: "С наступающим Днём инженера-механика!",
+      subtitle: "Вы идеально разбираетесь в сложных механизмах. А мы бережно настраиваем самый главный механизм — вашу спину и шею.",
+      offer: "Подарочный сертификат в Studio 53 — лучшее ТО для тела и мышц после напряжённой рабочей недели."
+    },
+    manager: {
+      date: "ЗАВТРА • 1 НОЯБРЯ",
+      title: "С наступающим Днём менеджера!",
+      subtitle: "Сотни звонков, чатов, таблиц и горящих задач. К выходным плечи поднимаются к ушам, а спина просит пощады.",
+      offer: "Порадуйте близкого человека или коллегу: подарочный сертификат на час полной перезагрузки в режиме тишины."
+    },
+    aviation: {
+      date: "ЗАВТРА • 1 НОЯБРЯ",
+      title: "С Днём работников гражданской авиации!",
+      subtitle: "Тем, кто поднимает самолёты в небо и отвечает за комфорт полёта, тоже нужно мягкое заземление.",
+      offer: "Подарите близким из авиации 60 минут полного релакса и невесомости в нашем уютном оазисе у м. Малиновка."
+    },
+    pm: {
+      date: "ЗАВТРА • 5 НОЯБРЯ",
+      title: "С Днём проектного менеджера!",
+      subtitle: "Держать в голове все дедлайны, спринты и команды — настоящий спорт для нервной системы и шейного отдела.",
+      offer: "Лучший подарок знакомому ПМу или айтишнику — 1 час вне чатов и созвонов на массажном столе Studio 53."
+    },
+    men: {
+      date: "ЗАВТРА • 7 НОЯБРЯ",
+      title: "С Всемирным днём мужчин!",
+      subtitle: "Мужчины редко жалуются на усталость и зажатую поясницу — они просто молча несут нагрузку каждый день.",
+      offer: "Идея подарка мужу, парню или отцу: сертификат на час глубокой силовой проработки спины или полного релакса."
+    },
+    accountant: {
+      date: "ЗАВТРА • 10 НОЯБРЯ",
+      title: "С наступающим Днём бухгалтера!",
+      subtitle: "Когда все отчёты сведены и цифры сошлись, наступает время восстановить самый важный баланс — внутренний.",
+      offer: "Подарите знакомому бухгалтеру 60 минут тишины, тепла и заботы о спине после недель за монитором."
+    }
+  };
+
+  const canvas = document.getElementById('storyCanvas');
+  const ctx = canvas.getContext('2d');
+  let bgImage = null;
+
+  // Разбивка текста на строки с предварительным замером (исключает наезды текста)
+  function getLines(context, text, maxWidth) {
+    const words = text.trim().split(/\s+/);
+    const lines = [];
+    let currentLine = words[0] || '';
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = context.measureText(currentLine + " " + word).width;
+      if (width < maxWidth) {
+        currentLine += " " + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawStory() {
+    const W = 1080, H = 1920;
+    ctx.clearRect(0, 0, W, H);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const layout = document.getElementById('layoutSelect').value;
+    const brightness = parseInt(document.getElementById('photoBrightness').value, 10) / 100;
+    const scrim = parseInt(document.getElementById('scrimOpacity').value, 10) / 100;
+    const zoom = parseInt(document.getElementById('photoZoom').value, 10) / 100;
+    const offsetY = parseInt(document.getElementById('photoOffsetY').value, 10);
+
+    // 1. Базовый темный фон
+    const baseGrad = ctx.createLinearGradient(0, 0, 0, H);
+    baseGrad.addColorStop(0, '#0e1413');
+    baseGrad.addColorStop(0.5, '#151f1d');
+    baseGrad.addColorStop(1, '#0a0e0d');
+    ctx.fillStyle = baseGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // 2. Отрисовка фонового фото в высоком качестве без мыльной пелены
+    if (bgImage) {
+      const baseScale = Math.max(W / bgImage.width, H / bgImage.height);
+      const finalScale = baseScale * zoom;
+      const nw = bgImage.width * finalScale;
+      const nh = bgImage.height * finalScale;
+      const dx = (W - nw) / 2;
+      const dy = (H - nh) / 2 + offsetY;
+
+      ctx.save();
+      ctx.globalAlpha = brightness;
+      ctx.drawImage(bgImage, dx, dy, nw, nh);
+      ctx.restore();
+
+      // Умный градиент: сверху и в фото-окне картинка остается четкой и яркой,
+      // а под текстом плавно уходит в благородный темный оттенок
+      const overlay = ctx.createLinearGradient(0, 0, 0, H);
+      if (layout === 'editorial') {
+        overlay.addColorStop(0, 'rgba(10, 15, 14, 0.65)');
+        overlay.addColorStop(0.18, 'rgba(10, 15, 14, 0.12)');
+        overlay.addColorStop(0.38, 'rgba(10, 15, 14, 0.18)');
+        overlay.addColorStop(0.52, `rgba(12, 18, 17, ${Math.min(0.95, scrim * 0.95)})`);
+        overlay.addColorStop(0.75, `rgba(10, 15, 14, ${scrim})`);
+        overlay.addColorStop(1, 'rgba(8, 12, 11, 0.97)');
+      } else {
+        overlay.addColorStop(0, `rgba(10, 15, 14, ${scrim * 0.85})`);
+        overlay.addColorStop(0.5, `rgba(12, 18, 17, ${scrim * 0.78})`);
+        overlay.addColorStop(1, 'rgba(8, 12, 11, 0.96)');
+      }
+      ctx.fillStyle = overlay;
+      ctx.fillRect(0, 0, W, H);
+    } else {
+      // Декоративное свечение, если фото еще не загружено
+      const glow = ctx.createRadialGradient(W / 2, 460, 40, W / 2, 460, 620);
+      glow.addColorStop(0, 'rgba(216, 180, 126, 0.22)');
+      glow.addColorStop(1, 'rgba(216, 180, 126, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // 3. Верхняя фирменная шапка (в безопасной зоне под аватаркой Stories)
+    ctx.textAlign = 'center';
+    const headerPillW = 760;
+    const headerPillH = 108;
+    const headerPillX = (W - headerPillW) / 2;
+    const headerPillY = 200;
+
+    ctx.fillStyle = 'rgba(15, 21, 20, 0.72)';
+    roundRect(ctx, headerPillX, headerPillY, headerPillW, headerPillH, 54);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(216, 180, 126, 0.38)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#e0be8b';
+    ctx.font = '700 26px Inter, sans-serif';
+    ctx.fillText('STUDIO 53  •  MINSK', W / 2, headerPillY + 46);
+
+    ctx.fillStyle = 'rgba(244, 241, 234, 0.82)';
+    ctx.font = '400 22px Inter, sans-serif';
+    ctx.fillText('Уютный оазис массажа • 5 мин от ст. м. Малиновка', W / 2, headerPillY + 82);
+
+    // 4. Расчет стартовой точки контента в зависимости от выбранной композиции
+    let cursorY = (layout === 'editorial') ? 690 : 420;
+
+    // 5. Плашка даты (например: ЗАВТРА • 30 ОКТЯБРЯ)
+    const badgeText = document.getElementById('dateBadge').value.toUpperCase();
+    ctx.font = '700 24px Inter, sans-serif';
+    const badgeW = Math.max(ctx.measureText(badgeText).width + 76, 350);
+    const badgeH = 58;
+    ctx.fillStyle = 'rgba(216, 180, 126, 0.16)';
+    roundRect(ctx, (W - badgeW) / 2, cursorY, badgeW, badgeH, 29);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(216, 180, 126, 0.65)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#ebd0a4';
+    ctx.fillText(badgeText, W / 2, cursorY + 38);
+    cursorY += badgeH + 64;
+
+    // 6. Главный заголовок праздника (с автоматическим замером строк)
+    const titleText = document.getElementById('titleInput').value;
+    ctx.font = '700 62px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = '#ffffff';
+    const titleLines = getLines(ctx, titleText, 900);
+    const titleLineH = 72;
+    titleLines.forEach(line => {
+      ctx.fillText(line, W / 2, cursorY);
+      cursorY += titleLineH;
+    });
+
+    cursorY += 12;
+
+    // 7. Подзаголовок (профессиональная боль + теплота)
+    const subText = document.getElementById('subtitleInput').value;
+    ctx.font = '400 32px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(244, 241, 234, 0.9)';
+    const subLines = getLines(ctx, subText, 860);
+    const subLineH = 45;
+    subLines.forEach(line => {
+      ctx.fillText(line, W / 2, cursorY);
+      cursorY += subLineH;
+    });
+
+    cursorY += 32;
+
+    // 8. ДИНАМИЧЕСКАЯ КАРТОЧКА ПОДАРОЧНОГО СЕРТИФИКАТА (Никогда не обрезает текст)
+    const cardX = 84;
+    const cardW = W - 168; // 912 px
+    const offerText = document.getElementById('offerInput').value;
+    const deliveryText = document.getElementById('deliveryInput').value;
+    const priceText = document.getElementById('priceInput').value;
+
+    // Замеряем строки внутри карточки заранее
+    ctx.font = '400 30px Inter, sans-serif';
+    const offerLines = getLines(ctx, offerText, cardW - 110);
+    const offerLineH = 42;
+
+    ctx.font = '500 24px Inter, sans-serif';
+    const deliveryLines = getLines(ctx, deliveryText, cardW - 90);
+    const deliveryLineH = 34;
+
+    // Точная высота карточки по сумме всех внутренних элементов
+    const cardPaddingTop = 58;
+    const headerBlockH = 115; // "ИДЕЯ ПОДАРКА" + "Подарочный сертификат"
+    const offerBlockH = offerLines.length * offerLineH;
+    const btnBlockH = 86;
+    const deliveryBlockH = deliveryLines.length * deliveryLineH;
+    const cardPaddingBottom = 38;
+
+    const cardH = cardPaddingTop + headerBlockH + offerBlockH + 28 + btnBlockH + 34 + deliveryBlockH + cardPaddingBottom;
+    const cardY = cursorY;
+
+    // Тень и фон карточки сертификата
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+    ctx.shadowBlur = 35;
+    ctx.shadowOffsetY = 14;
+
+    const cardGrad = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
+    cardGrad.addColorStop(0, 'rgba(28, 39, 36, 0.95)');
+    cardGrad.addColorStop(1, 'rgba(16, 23, 21, 0.98)');
+    ctx.fillStyle = cardGrad;
+    roundRect(ctx, cardX, cardY, cardW, cardH, 36);
+    ctx.fill();
+    ctx.restore();
+
+    // Двойная подарочная рамка карточки (эффект настоящего сертификата)
+    ctx.strokeStyle = '#d8b47e';
+    ctx.lineWidth = 2.5;
+    roundRect(ctx, cardX, cardY, cardW, cardH, 36);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(216, 180, 126, 0.22)';
+    ctx.lineWidth = 1.2;
+    roundRect(ctx, cardX + 14, cardY + 14, cardW - 28, cardH - 28, 26);
+    ctx.stroke();
+
+    // Внутренний контент карточки
+    let innerY = cardY + cardPaddingTop;
+
+    ctx.fillStyle = '#e0be8b';
+    ctx.font = '700 23px Inter, sans-serif';
+    ctx.fillText('🎁  ИДЕЯ ПОДАРКА НАКАНУНЕ ПРАЗДНИКА', W / 2, innerY);
+    innerY += 56;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 46px "Playfair Display", Georgia, serif';
+    ctx.fillText('Подарочный сертификат', W / 2, innerY);
+    innerY += 54;
+
+    // Текст оффера внутри карточки
+    ctx.fillStyle = 'rgba(244, 241, 234, 0.9)';
+    ctx.font = '400 30px Inter, sans-serif';
+    offerLines.forEach(line => {
+      ctx.fillText(line, W / 2, innerY);
+      innerY += offerLineH;
+    });
+
+    innerY += 16;
+
+    // Золотая кнопка с ценой (строго под текстом оффера, без наездов!)
+    const btnW = cardW - 130;
+    const btnX = (W - btnW) / 2;
+    const btnGrad = ctx.createLinearGradient(btnX, innerY, btnX + btnW, innerY + btnBlockH);
+    btnGrad.addColorStop(0, '#ebd0a4');
+    btnGrad.addColorStop(0.5, '#d8b47e');
+    btnGrad.addColorStop(1, '#b98b4a');
+
+    ctx.fillStyle = btnGrad;
+    roundRect(ctx, btnX, innerY, btnW, btnBlockH, 22);
+    ctx.fill();
+
+    ctx.fillStyle = '#101615';
+    ctx.font = '800 33px Inter, sans-serif';
+    ctx.fillText(priceText, W / 2, innerY + 54);
+
+    innerY += btnBlockH + 46;
+
+    // Строка про электронный и бумажный сертификат (авто-перенос внутри рамок)
+    ctx.fillStyle = '#e5c592';
+    ctx.font = '500 24px Inter, sans-serif';
+    deliveryLines.forEach(line => {
+      ctx.fillText(line, W / 2, innerY);
+      innerY += deliveryLineH;
+    });
+
+    // 9. Нижний блок призыва к действию (без внешней рамки, которая раньше перечеркивала текст)
+    const ctaY = Math.max(cardY + cardH + 54, 1590);
+
+    ctx.fillStyle = 'rgba(244, 241, 234, 0.88)';
+    ctx.font = '500 27px Inter, sans-serif';
+    ctx.fillText('Оформить за 12 секунд через бот или на сайте s53.by 👇', W / 2, ctaY);
+
+    if (document.getElementById('showStickerGuide').checked) {
+      const stW = 580;
+      const stH = 92;
+      const stX = (W - stW) / 2;
+      const stY = ctaY + 26;
+
+      ctx.fillStyle = 'rgba(216, 180, 126, 0.12)';
+      roundRect(ctx, stX, stY, stW, stH, 46);
+      ctx.fill();
+
+      ctx.setLineDash([10, 8]);
+      ctx.strokeStyle = 'rgba(216, 180, 126, 0.65)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, stX, stY, stW, stH, 46);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#ebd0a4';
+      ctx.font = '700 27px Inter, sans-serif';
+      ctx.fillText('🔗 S53.BY • ЗАКАЗАТЬ СЕРТИФИКАТ', W / 2, stY + 56);
+    }
+  }
+
+  // Слушатели событий
+  document.getElementById('presetSelect').addEventListener('change', (e) => {
+    const p = presets[e.target.value];
+    if (p) {
+      document.getElementById('dateBadge').value = p.date;
+      document.getElementById('titleInput').value = p.title;
+      document.getElementById('subtitleInput').value = p.subtitle;
+      document.getElementById('offerInput').value = p.offer;
+      drawStory();
+    }
+  });
+
+  ['layoutSelect', 'dateBadge', 'titleInput', 'subtitleInput', 'offerInput', 'priceInput', 'deliveryInput', 'showStickerGuide'].forEach(id => {
+    document.getElementById(id).addEventListener('input', drawStory);
+    document.getElementById(id).addEventListener('change', drawStory);
+  });
+
+  ['photoBrightness', 'scrimOpacity', 'photoZoom', 'photoOffsetY'].forEach(id => {
+    document.getElementById(id).addEventListener('input', (e) => {
+      document.getElementById('brightVal').textContent = document.getElementById('photoBrightness').value + '%';
+      document.getElementById('scrimVal').textContent = document.getElementById('scrimOpacity').value + '%';
+      document.getElementById('zoomVal').textContent = document.getElementById('photoZoom').value + '%';
+      document.getElementById('offsetYVal').textContent = document.getElementById('photoOffsetY').value;
+      drawStory();
+    });
+  });
+
+  document.getElementById('bgUpload').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => { bgImage = img; drawStory(); };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const link = document.createElement('a');
+    const presetName = document.getElementById('presetSelect').value;
+    link.download = `studio53-story-v2-${presetName}-9x16.png`;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    link.click();
+  });
+
+  document.fonts.ready.then(drawStory);
+  window.onload = drawStory;
+</script>
+</body>
+</html>
